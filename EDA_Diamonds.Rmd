@@ -1,0 +1,107 @@
+---
+title: "Diamond Data Analysis"
+author: "Tejaswi G"
+date: "15-04-24"
+output: html_document
+---
+
+```{r setup, include=FALSE,echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("tidyverse")
+```
+
+## Introduction
+
+Here, I am covering Exploratory Data Analysis. Specifically, we'll use data visualization and transformation to explore the 'diamonds' data set.
+
+1. What type of variation occours within my variables?
+2. What type of covariation occours between my variables?
+
+```{r, echo = FALSE}
+glimpse(diamonds)
+```
+
+
+## Variation
+
+- Categorical Variables
+```{r bar_plot, fig.cap = "Bar CHart Looking at Diamond Cut"}
+ggplot(diamonds) + geom_bar(aes(x=cut))
+```
+
+```{r cut_count}
+diamonds %>% count(cut)
+```
+- Continuous Variables
+
+```{r hist_carat}
+ggplot(diamonds) + geom_histogram(aes(x = carat),binwidth = 0.5)
+```
+## Data Cleaning
+
+```{r small_dataset_creation}
+small <- diamonds %>% filter(carat < 3)
+```
+
+```{r small_hist}
+ggplot(small, aes(x=carat)) + geom_histogram(binwidth = 0.1)
+```
+## Typical Values
+
+1. Which values are the most common? Why?
+2. Which  values are rare? Why Does that match your expectations?
+3. Can you see any unusual patterns that might explain them?
+
+```{r}
+ggplot(small,aes(x = carat)) + geom_histogram(binwidth = 0.01)
+```
+**Questions that needs to be answered**
+-Why are more diamonds at whole carats?
+-Why are there more diamonds that are more than the right of the common carats?
+
+## Covariation
+
+### Categorical vs Continuous
+
+```{r}
+ggplot(diamonds) + geom_bar(aes(x=cut))
+```
+
+```{r}
+ggplot(diamonds, aes(x=price)) + geom_freqpoly(aes(color = cut),binwdth=500)
+```
+-Boxplot
+```{r}
+ggplot(diamonds, aes(x = cut, y = price)) + geom_boxplot()
+```
+
+
+### Categorical vs Categorical 
+
+```{r}
+diamonds %>% count(color, cut) %>% ggplot(aes(x=color, y = cut)) + geom_tile(aes(fill=n))
+```
+
+### Continuous vs Continuous 
+```{r}
+ggplot(diamonds) + geom_point(aes(x=carat, y=price), alpha=1/100)
+```
+```{r}
+ggplot(diamonds) + geom_hex(aes(x=carat, y = price))
+```
+```{r}
+ggplot(diamonds, aes(x=carat, y=price)) + geom_boxplot(aes(group=cut_width(carat, 0.1)))
+```
+### Pattern and Models
+
+```{r}
+mod <- lm(log(price) ~ log(carat), data = diamonds)
+```
+
+```{r summary_mod}
+summary(mod)
+```
+
+
+
+
